@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Tests</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+
+    // wir definieren eine Variable welche in allen Closures gilt
+    var audioElement;
+    var alternate;
+    var playInterval;
+
+    var vocabulary = {
+        "items" : [
+            {
+                "de_text" : "Liebe",
+                "de_img" : "liebe.jpg",
+                "de_mp3" : "http://www.leo.org/dict/audio_de/Liebe.mp3",
+                "es_text" : "amor",
+                "es_img" : "amor.jpg",
+                "es_mp3" : "http://www.leo.org/dict/audio_es/amor.mp3"
+
+            },
+            {
+                "de_text" : "Hand",
+                "de_img" : "hand.jpg",
+                "de_mp3" : "http://www.leo.org/dict/audio_de/Hand.mp3",
+                "es_text" : "mano",
+                "es_img" : "mano.jpg",
+                "es_mp3" : "http://www.leo.org/dict/audio_es/mano.mp3"
+
+            }
+
+        ]
+    }
+
+    var numVoc = vocabulary.items.length;
+    numVoc--;
+    var indexVoc = 0;
+    var nextVoc = 0;
+
+
+    function playAudio() {
+
+        var de_text = vocabulary.items[indexVoc].de_text;
+        var es_text = vocabulary.items[indexVoc].es_text;
+        var de_mp3 = vocabulary.items[indexVoc].de_mp3;
+        var es_mp3 = vocabulary.items[indexVoc].es_mp3;
+
+        if(alternate) {
+            audioElement.src = de_mp3;
+            $("#output").text(de_text);
+            alternate = false;
+
+        } else {
+            audioElement.src = es_mp3;
+            $("#output").text(es_text);
+            alternate = true;
+
+
+        }
+        // mobile Device caching ist zu langsam...
+        //audioElement.play();
+
+        audioElement.addEventListener('canplay', function() {
+            //alert(audioElement.src);
+            audioElement.play();
+
+        }, false);
+
+        nextVoc++;
+
+        if(nextVoc == 2) {
+            if(indexVoc == numVoc ) {
+                indexVoc = 0;
+            } else {
+                indexVoc++;
+            }
+            nextVoc = 0;
+        }
+
+        setTimeout(playAudio, 10000);
+        /*
+        audioElement.addEventListener('canplay', function() {
+            audioElement.play();
+            nextVoc++;
+
+            if(nextVoc == 2) {
+                if(indexVoc == numVoc ) {
+                    indexVoc = 0;
+                } else {
+                    indexVoc++;
+                }
+                nextVoc = 0;
+            }
+
+            setTimeout(playAudio, 3000);
+        }, false);
+
+        //setTimeout(reallyPlayAudio,1500);
+
+*/
+
+    }
+
+    function reallyPlayAudio() {
+        audioElement.play();
+        setTimeout(playAudio, 3000);
+    }
+
+    $(document).ready(function() {
+        alternate = true;
+
+        audioElement = new Audio("");
+        audioElement.controls = true;
+        //audioElement.volume = 100;
+
+        // im DOM einfügen, sonst wird es nicht abgespielt
+        document.body.appendChild(audioElement);
+
+        setTimeout(playAudio, 3000);
+        //playInterval = setInterval(playAudio, 7000);
+
+        $("#start").click(function () {
+            playInterval = setInterval(playAudio, 7000);
+        });
+
+        $("#stop").click(function () {
+            audioElement.src = '';
+            clearInterval(playInterval);
+        });
+
+
+    });
+
+    </script>
+
+</head>
+<body>
+
+<div id="output">App starts in a few seconds</div>
+
+<button id="start">Start</button>
+
+<button id="stop">Stop</button>
+<br />
+
+</body>
+</html>
